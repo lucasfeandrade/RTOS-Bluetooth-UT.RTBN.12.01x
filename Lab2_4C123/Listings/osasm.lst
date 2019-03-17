@@ -1,0 +1,111 @@
+
+
+
+ARM Macro Assembler    Page 1 
+
+
+    1 00000000         ;/******************************************************
+                       ***********************/
+    2 00000000         ; OSasm.s: low-level OS commands, written in assembly   
+                                           */
+    3 00000000         ; Runs on LM4F120/TM4C123/MSP432
+    4 00000000         ; Lab 2 starter file
+    5 00000000         ; February 10, 2016
+    6 00000000         ;
+    7 00000000         
+    8 00000000         
+    9 00000000                 AREA             |.text|, CODE, READONLY, ALIGN=
+2
+   10 00000000                 THUMB
+   11 00000000                 REQUIRE8
+   12 00000000                 PRESERVE8
+   13 00000000         
+   14 00000000                 EXTERN           RunPt       ; currently running
+                                                             thread
+   15 00000000                 EXPORT           StartOS
+   16 00000000                 EXPORT           SysTick_Handler
+   17 00000000                 IMPORT           Scheduler
+   18 00000000         
+   19 00000000         
+   20 00000000         SysTick_Handler                      ; 1) Saves R0-R3,R1
+                                                            2,LR,PC,PSR
+   21 00000000 B672            CPSID            I           ; 2) Prevent interr
+                                                            upt during switch
+   22 00000002         
+   23 00000002 B662            CPSIE            I           ; 9) tasks run with
+                                                             interrupts enabled
+                                                            
+   24 00000004 4770            BX               LR          ; 10) restore R0-R3
+                                                            ,R12,LR,PC,PSR
+   25 00000006         
+   26 00000006         StartOS
+   27 00000006         
+   28 00000006 B662            CPSIE            I           ; Enable interrupts
+                                                             at processor level
+                                                            
+   29 00000008 4770            BX               LR          ; start first threa
+                                                            d
+   30 0000000A         
+   31 0000000A 00 00           ALIGN
+   32 0000000C                 END
+Command Line: --debug --xref --diag_suppress=9931 --cpu=Cortex-M4 --apcs=interw
+ork --depend=.\objects\osasm.d -o.\objects\osasm.o -I.\RTE\_Target -IC:\Keil_v5
+\ARM\PACK\ARM\CMSIS\5.4.0\CMSIS\Core\Include -IC:\Keil_v5\ARM\PACK\Keil\TM4C_DF
+P\1.1.0\Device\Include\TM4C123 --predefine="__EVAL SETA 1" --predefine="__UVISI
+ON_VERSION SETA 526" --predefine="_RTE_ SETA 1" --predefine="TM4C123GH6PM SETA 
+1" --list=.\listings\osasm.lst osasm.s
+
+
+
+ARM Macro Assembler    Page 1 Alphabetic symbol ordering
+Relocatable symbols
+
+.text 00000000
+
+Symbol: .text
+   Definitions
+      At line 9 in file osasm.s
+   Uses
+      None
+Comment: .text unused
+StartOS 00000006
+
+Symbol: StartOS
+   Definitions
+      At line 26 in file osasm.s
+   Uses
+      At line 15 in file osasm.s
+Comment: StartOS used once
+SysTick_Handler 00000000
+
+Symbol: SysTick_Handler
+   Definitions
+      At line 20 in file osasm.s
+   Uses
+      At line 16 in file osasm.s
+Comment: SysTick_Handler used once
+3 symbols
+
+
+
+ARM Macro Assembler    Page 1 Alphabetic symbol ordering
+External symbols
+
+RunPt 00000000
+
+Symbol: RunPt
+   Definitions
+      At line 14 in file osasm.s
+   Uses
+      None
+Comment: RunPt unused
+Scheduler 00000000
+
+Symbol: Scheduler
+   Definitions
+      At line 17 in file osasm.s
+   Uses
+      None
+Comment: Scheduler unused
+2 symbols
+339 symbols in table
