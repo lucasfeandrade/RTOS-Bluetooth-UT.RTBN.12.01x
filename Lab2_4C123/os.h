@@ -28,6 +28,7 @@
 // grader needs access to TCBs and stacks
 #define NUMTHREADS  4        // maximum number of threads
 #define STACKSIZE   100      // number of 32-bit words in stack per thread
+
 struct tcb{
   int32_t *sp;       // pointer to stack (valid for threads not running
   struct tcb *next;  // linked-list pointer

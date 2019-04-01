@@ -31,81 +31,66 @@ ARM Macro Assembler    Page 1
                                                             2,LR,PC,PSR
    21 00000000 B672            CPSID            I           ; 2) Prevent interr
                                                             upt during switch
-   22 00000002         
-   23 00000002 B662            CPSIE            I           ; 9) tasks run with
+   22 00000002 E92D 0FF0       PUSH             {R4-R11}    ; 3) Saving R4 to R
+                                                            11 into stack
+   23 00000006 480E            LDR              R0, =RunPT  ; 4) R0 now points 
+                                                            to run pointer
+   24 00000008 6801            LDR              R1, [R0]    ; R1 = RunPt
+   25 0000000A F8C1 D000       STR              SP, [R1]    ; 5) Save stack poi
+                                                            nter into TCB
+   26 0000000E 6849            LDR              R1, [R1,#4] ; 6) R1 = RunPt->ne
+                                                            xt summing 4
+   27 00000010 6001            STR              R1, [R0]    ;    RunPt = R1
+   28 00000012 F8D1 D000       LDR              SP, [R1]    ; 7) SP = RunPt->sp
+                                                            ;
+   29 00000016 E8BD 0FF0       POP              {R4-R11}    ; 8) restore regist
+                                                            ers r4 to r11
+   30 0000001A B662            CPSIE            I           ; 9) tasks run with
                                                              interrupts enabled
                                                             
-   24 00000004 4770            BX               LR          ; 10) restore R0-R3
+   31 0000001C 4770            BX               LR          ; 10) restore R0-R3
                                                             ,R12,LR,PC,PSR
-   25 00000006         
-   26 00000006         StartOS
-   27 00000006         
-   28 00000006 B662            CPSIE            I           ; Enable interrupts
+   32 0000001E         
+   33 0000001E         StartOS
+   34 0000001E         
+   35 0000001E B662            CPSIE            I           ; Enable interrupts
                                                              at processor level
                                                             
-   29 00000008 4770            BX               LR          ; start first threa
+   36 00000020 4808            LDR              R0, =RunPt  ; initiate currentl
+                                                            y running thread
+   37 00000022 6802            LDR              R2, [R0]    ; R2 receives the v
+                                                            alue of RunPt
+   38 00000024 F8D2 D000       LDR              SP, [R2]    ; new thread SP; SP
+                                                             = RunPt->stackPoin
+                                                            ter;
+
+
+
+ARM Macro Assembler    Page 2 
+
+
+   39 00000028 E8BD 0FF0       POP              {R4-R11}    ; restore registers
+                                                             r4 to r11
+   40 0000002C BC0F            POP              {R0-R3}     ; restore registers
+                                                             r0 to r3
+   41 0000002E F85D CB04       POP              {R12}
+   42 00000032 B001            ADD              SP,SP,#4    ; discard LR from i
+                                                            nitial stack
+   43 00000034 F85D EB04       POP              {LR}        ; start location
+   44 00000038 B001            ADD              SP,SP,#4    ; discard PSR
+   45 0000003A B662            CPSIE            I           ; Enable interrupts
+                                                             at processor level
+                                                            
+   46 0000003C 4770            BX               LR          ; start first threa
                                                             d
-   30 0000000A         
-   31 0000000A 00 00           ALIGN
-   32 0000000C                 END
+   47 0000003E         
+   48 0000003E 00 00           ALIGN
+   49 00000040                 END
+              00000000 
+              00000000 
 Command Line: --debug --xref --diag_suppress=9931 --cpu=Cortex-M4 --apcs=interw
 ork --depend=.\objects\osasm.d -o.\objects\osasm.o -I.\RTE\_Target -IC:\Keil_v5
 \ARM\PACK\ARM\CMSIS\5.4.0\CMSIS\Core\Include -IC:\Keil_v5\ARM\PACK\Keil\TM4C_DF
 P\1.1.0\Device\Include\TM4C123 --predefine="__EVAL SETA 1" --predefine="__UVISI
 ON_VERSION SETA 526" --predefine="_RTE_ SETA 1" --predefine="TM4C123GH6PM SETA 
 1" --list=.\listings\osasm.lst osasm.s
-
-
-
-ARM Macro Assembler    Page 1 Alphabetic symbol ordering
-Relocatable symbols
-
-.text 00000000
-
-Symbol: .text
-   Definitions
-      At line 9 in file osasm.s
-   Uses
-      None
-Comment: .text unused
-StartOS 00000006
-
-Symbol: StartOS
-   Definitions
-      At line 26 in file osasm.s
-   Uses
-      At line 15 in file osasm.s
-Comment: StartOS used once
-SysTick_Handler 00000000
-
-Symbol: SysTick_Handler
-   Definitions
-      At line 20 in file osasm.s
-   Uses
-      At line 16 in file osasm.s
-Comment: SysTick_Handler used once
-3 symbols
-
-
-
-ARM Macro Assembler    Page 1 Alphabetic symbol ordering
-External symbols
-
-RunPt 00000000
-
-Symbol: RunPt
-   Definitions
-      At line 14 in file osasm.s
-   Uses
-      None
-Comment: RunPt unused
-Scheduler 00000000
-
-Symbol: Scheduler
-   Definitions
-      At line 17 in file osasm.s
-   Uses
-      None
-Comment: Scheduler unused
-2 symbols
-339 symbols in table
