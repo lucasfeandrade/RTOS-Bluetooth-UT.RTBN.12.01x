@@ -394,9 +394,10 @@ void Task5(void){int32_t soundSum;
 /* ****************************************** */
 /*          End of Task5 Section              */
 /* ****************************************** */
+int32_t s1,s2;
 
 int main(void){
-  OS_Init();
+	OS_Init();
   Profile_Init();  // initialize the 7 hardware profiling pins
   Task0_Init();    // microphone init
   Task1_Init();    // accelerometer init

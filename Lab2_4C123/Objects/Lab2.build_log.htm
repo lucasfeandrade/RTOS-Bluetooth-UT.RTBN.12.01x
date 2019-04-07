@@ -30,12 +30,15 @@ Rebuild target 'Target'
 assembling osasm.s...
 osasm.s(23): error: A1516E: Bad symbol 'RunPT', not defined or external
 compiling os.c...
+os.c(104): warning:  #111-D: statement is unreachable
+    return 1;               // successful
+os.c: 1 warning, 0 errors
 compiling Lab2.c...
 assembling startup_TM4C123.s...
-compiling system_TM4C123.c...
 compiling Profile.c...
+compiling system_TM4C123.c...
 compiling BSP.c...
-".\Objects\Lab2.axf" - 1 Error(s), 0 Warning(s).
+".\Objects\Lab2.axf" - 1 Error(s), 1 Warning(s).
 
 <h2>Software Packages used:</h2>
 
@@ -65,7 +68,7 @@ Package Vendor: Keil
       Source file:   Device\Source\ARM\startup_TM4C123.s
       Source file:   Device\Source\system_TM4C123.c
 Target not created.
-Build Time Elapsed:  00:00:02
+Build Time Elapsed:  00:00:04
 </pre>
 </body>
 </html>

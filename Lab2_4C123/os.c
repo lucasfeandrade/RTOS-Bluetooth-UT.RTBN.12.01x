@@ -9,6 +9,8 @@
 #include "../inc/CortexM.h"
 #include "../inc/BSP.h"
 
+
+
 // function definitions in osasm.s
 void StartOS(void);
 
@@ -17,9 +19,16 @@ tcbType tcbs[NUMTHREADS];
 tcbType *RunPt;
 int32_t Stacks[NUMTHREADS][STACKSIZE];
 uint32_t Mail;  // shared data
-int32_t Send=0; // semaphore
-int32_t Ack=0;  // semaphore
-uint32_t Lost=0;
+int32_t Send; // semaphore
+int32_t Ack;  // semaphore
+uint32_t Lost;
+uint16_t maximumPeriodThread;
+typedef void (*taskP)(void);
+
+struct PeriodicThread {
+	uint16_t period;
+	taskP task;
+}	PeriodicThreads[2];
 
 
 // ******** OS_Init ************
@@ -100,8 +109,6 @@ int OS_AddThreads3(void(*task0)(void),
   SetInitialStack(2); Stacks[2][STACKSIZE-2] = (int32_t)(task2); // PC
   RunPt = &tcbs[0];       // thread 0 will run first
   return 1;               // successful
-
-  return 1;               // successful
 }
                  
 //******** OS_AddPeriodicEventThreads ***************
@@ -117,7 +124,25 @@ int OS_AddThreads3(void(*task0)(void),
 int OS_AddPeriodicEventThreads(void(*thread1)(void), uint32_t period1,
   void(*thread2)(void), uint32_t period2){
   //***YOU IMPLEMENT THIS FUNCTION*****
-
+	uint16_t minimumPeriodThread;
+	if(period1 > period2)
+	{
+		maximumPeriodThread = period1;
+		minimumPeriodThread = period2;
+	}
+	else
+	{
+		maximumPeriodThread = period2;
+		minimumPeriodThread = period1;
+	}
+	
+//	if(!(maximumPeriodThread % minimumPeriodThread))
+//		return 0;
+	
+	PeriodicThreads[0].period = period1;
+	PeriodicThreads[0].task = thread1;
+	PeriodicThreads[1].period = period2;
+	PeriodicThreads[1].task = thread2;
   return 1;
 }
 
@@ -134,11 +159,18 @@ void OS_Launch(uint32_t theTimeSlice){
   STCTRL = 0x00000007;         // enable, core clock and interrupt arm
   StartOS();                   // start on the first task
 }
+
+uint32_t Counter;
 // runs every ms
 void Scheduler(void){ // every time slice
   // run any periodic event threads if needed
   // implement round robin scheduler, update RunPt
   //***YOU IMPLEMENT THIS FUNCTION*****
+	Counter = (Counter+1)%maximumPeriodThread;
+	if(Counter%PeriodicThreads[0].period ==0)
+		PeriodicThreads[0].task();
+	if(Counter%PeriodicThreads[1].period ==0)
+		PeriodicThreads[1].task();
 	RunPt = RunPt->next;
 }
 
@@ -149,7 +181,9 @@ void Scheduler(void){ // every time slice
 // Outputs: none
 void OS_InitSemaphore(int32_t *semaPt, int32_t value){
   //***YOU IMPLEMENT THIS FUNCTION*****
-
+	DisableInterrupts();
+	*semaPt = value;
+	EnableInterrupts();
 }
 
 // ******** OS_Wait ************
@@ -163,7 +197,7 @@ void OS_Wait(int32_t *semaPt){
 		EnableInterrupts();
 		DisableInterrupts();
 	}
-	*semaPt--;
+	(*semaPt)--;
 	EnableInterrupts();
 }
 
@@ -176,7 +210,7 @@ void OS_Wait(int32_t *semaPt){
 void OS_Signal(int32_t *semaPt){
 //***YOU IMPLEMENT THIS FUNCTION*****
 	DisableInterrupts();	
-	*semaPt++;
+	(*semaPt)++;
 	EnableInterrupts();
 }
 
@@ -191,7 +225,9 @@ void OS_Signal(int32_t *semaPt){
 void OS_MailBox_Init(void){
   // include data field and semaphore
   //***YOU IMPLEMENT THIS FUNCTION*****
-	
+	Send = 0;
+	Ack = 0;
+	Lost = 0;
 }
 
 // ******** OS_MailBox_Send ************
@@ -225,5 +261,6 @@ uint32_t OS_MailBox_Recv(void){ uint32_t data;
 	OS_Signal(&Ack);
 	return data;
 }
+
 
 

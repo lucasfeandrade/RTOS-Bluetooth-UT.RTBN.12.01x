@@ -1,0 +1,6 @@
+--cpu Cortex-M4 --pd "__EVAL SETA 1" -g --apcs=interwork 
+-I.\RTE\_Target
+-IC:\Keil_v5\ARM\PACK\ARM\CMSIS\5.4.0\CMSIS\Core\Include
+-IC:\Keil_v5\ARM\PACK\Keil\TM4C_DFP\1.1.0\Device\Include\TM4C123
+--pd "__UVISION_VERSION SETA 526" --pd "_RTE_ SETA 1" --pd "TM4C123GH6PM SETA 1"
+--list .\listings\osasm.lst --xref -o .\objects\osasm.o --depend .\objects\osasm.d "osasm.s"
